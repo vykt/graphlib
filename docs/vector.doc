@@ -1,0 +1,118 @@
+vykt's graph library - vectors
+------------------------------
+
+
+	vector_t:
+
+	The vector type, creates a vector struct with members:
+
+		char * vector 	 - Vector memory in heap.
+	
+		size_t data_size - Size of an individual element inside the vector.
+
+		uint64_t length  - Number of elements currently in the vector.
+
+
+
+To use a vector, define a vector struct using the vector_t type. Once done, the
+vector needs to be initialised via the builder function. The vector must be
+initialised otherwise all functions called on it will fail.
+
+	vector_ini():
+
+	Vector initialiser function. Takes:
+
+		vector_t * v     - Vector to initialise.
+
+		size_t data_size - Size of each element in the vector. Get with sizeof().
+	
+	Returns:
+
+		VECTOR_SUCCESS  - Successful execution.
+		VECTOR_NULL_ERR - One or more necessary arguments are NULL.
+
+
+
+If a vector ever needs to be terminated without termination of the program, the
+memory it holds in the heap should be freed using the termination function.
+
+	vector_end():
+
+	Vector termination function. Frees memory. Takes:
+
+		vector_t * v - Vector to terminate.
+
+	Returns:
+
+		VECTOR_SUCCESS  - Successful execution.
+		VECTOR_NULL_ERR - One or more necessary arguments are NULL.
+
+
+
+Values can be added, removed and retrieved from the vector using the 3 operation
+functions.
+
+	vector_add():
+
+	Add item to a vector. Takes:
+
+		vector_t * v   - Vector to add to.
+
+		uint64_t pos   - Position to add to.
+
+		char * data    - Data to add to the vector.
+
+		uint8_t append - Whether to append to the end of the vector. If set to
+		                 true, value of pos is ignored.
+		                   VECTOR_APPEND_TRUE
+						   VECTOR_APPEND_FALSE
+
+	Returns:
+
+		VECTOR_SUCCESS           - Successful execution.
+		VECTOR_NULL_ERR          - One or more necessary arguments are NULL.
+		VECTOR_FULL_ERR          - Vector is full.
+		VECTOR_OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		VECTOR_MEM_ERR           - Unable to reallocate vector heap memory.
+
+	--- --- ---
+
+	vector_rmv():
+
+	Remove item from a vector. Takes:
+
+		vector_t * v - Vector to remove from.
+		uint64_t pos - Position to remove.
+
+	Returns:
+
+		VECTOR_SUCCESS           - Successful Execution.
+		VECTOR_NULL_ERR          - One or more necessary arguments are NULL.
+		VECTOR_EMPTY_ERR         - Vector is empty, unable to remove.
+		VECTOR_OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		VECTOR_MEM_ERR           - Unable to reallocate vector heap memory.
+
+	--- --- ---
+
+	vector_rmv():
+
+	Remove item from a vector. Takes:
+
+		vector_t * v - Vector to get from.
+		uint64_t pos - Position to get.
+		char * data  - Buffer to write data to.
+
+	Returns:
+
+		VECTOR_SUCCESS           - Successful Execution.
+		VECTOR_NULL_ERR          - One or more necessary arguments are NULL.
+		VECTOR_EMPTY_ERR         - Vector is empty, unable to remove.
+		VECTOR_OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+
+
+
+Notes:
+
+Notice that the pointer to the data stored by the vector is a character pointer.
+This is done to allow for byte by byte pointer arithmetic. Values can be stored
+and retrieved without casting, although casting would resolve warnings.
