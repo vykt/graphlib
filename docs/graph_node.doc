@@ -1,0 +1,108 @@
+vykt's graph library - graph nodes
+----------------------------------
+
+	graph_node_t:
+
+	The graph node type, creates a graph_node struct with members:
+
+		char * data           - Pointer to data held by node, in heap. Any data type.
+
+		size_t data_size      - Size of data held by node.
+
+		vector_t neighbours   - Vector of pointers to neighbouring nodes.
+
+		vector_t edge_weights - Vector of weights of each edge to neighbouring nodes.
+
+
+
+To create a graph node, define a graph_node struct using graph_node_t type. Once done,
+the graph node needs to be initialised via te builder function. The graph node must
+be initialised, otherwise all other functions will fail.
+
+	graph_node_ini():
+
+	Graph node initialiser function. Takes:
+
+		graph_node_t * n - Graph node to initialise.
+
+		char * data      - Data to place in node.
+
+		size_t data_size - Size of data in node.
+
+		uint64_t         - ID of node.
+
+	Returns:
+
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
+		MEM_ERR  - Unable to allocate/reallocate memory.
+
+
+If a vector ever needs to be terminated, the graph_node_end() function should be used
+to free any allocated memory and remove the node from neighbour listings of
+neighbouring nodes.
+
+	graph_node_end():
+
+	Graph node terminator function. Takes:
+
+		graph_node_t * n - Graph node to terminate.
+
+	Returns:
+
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
+
+
+Upon creation of a node, neighbours can be added or removed to/from it. Its data value
+can also be changed.
+
+	graph_node_set_dat():
+
+	Set the data value of a node. Takes:
+
+		graph_node_t * n - Subject graph node.
+
+		char * data      - Data to set.
+
+	Returns:
+
+		Nothing.
+
+	--- --- ---
+
+	graph_node_add_nbr():
+
+	Add neighbour to a node. Takes:
+
+		graph_node_t * n         - Subject graph node.
+
+		graph_node_t * neighbour - Pointer to neighbour node.
+
+		int64_t weight           - Weight of edge to neighbour.
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		FULL_ERR          - Vector is full.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_node_rmv_nbr():
+
+	Remove neighour from a node. Takes:
+
+		graph_node_t * n - Subject graph node.
+		uint64_t id      - ID of neighbour node to remove.
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to remove neighbour, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		FULL_ERR          - Vector is full.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.

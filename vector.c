@@ -3,10 +3,27 @@
 #include <string.h>
 
 #include "vector.h"
+#include "error.h"
 
-//TODO DEBUG INCLUDE
-#include <stdio.h>
-#include <errno.h>
+
+//Set element's data
+int vector_set(vector_t * v, uint64_t pos, char * data) {
+
+	//Check for NULL
+	if (v == NULL || data == NULL) {
+		return NULL_ERR;
+	}
+
+	//Check if asking to set out of bounds
+	if (pos >= v->length) {
+		return OUT_OF_BOUNDS_ERR;
+	}
+
+	//Copy data to vector entry
+	memcpy(v->vector + (pos * v->data_size), data, v->data_size);
+	
+	return SUCCESS;
+}
 
 
 //Add element
@@ -14,17 +31,17 @@ int vector_add(vector_t * v, uint64_t pos, char * data, uint8_t append) {
 
 	//Check for NULL
 	if (v == NULL || data == NULL || v->data_size == 0) {
-		return VECTOR_NULL_ERR;
+		return NULL_ERR;
 	}
 
 	//Check if max capacity reached
 	if (v->length == sizeof(uint64_t) - 1) {
-		return VECTOR_FULL_ERR;
+		return FULL_ERR;
 	}
 
 	//Check if asking for data out of bounds
 	if (pos > v->length) {
-		return VECTOR_OUT_OF_BOUNDS_ERR;
+		return OUT_OF_BOUNDS_ERR;
 	}
 
 	//Check for append
@@ -35,7 +52,7 @@ int vector_add(vector_t * v, uint64_t pos, char * data, uint8_t append) {
 	v->length = v->length + 1;
 	v->vector = realloc(v->vector, (size_t) (v->length * v->data_size));
 	if (v->vector == NULL) {
-		return VECTOR_MEM_ERR;
+		return MEM_ERR;
 	}
 
 	//Move vector entries	
@@ -50,7 +67,7 @@ int vector_add(vector_t * v, uint64_t pos, char * data, uint8_t append) {
 	//Add new entry
 	memcpy(v->vector + (pos * v->data_size), data, v->data_size);
 	
-	return VECTOR_SUCCESS;
+	return SUCCESS;
 }
 
 
@@ -59,17 +76,17 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 
 	//Check for NULL
 	if (v == NULL) {
-		return VECTOR_NULL_ERR;
+		return NULL_ERR;
 	}
 
 	//Check if vector is empty
 	if (v->length == 0) {
-		return VECTOR_EMPTY_ERR;
+		return EMPTY_ERR;
 	}
 
 	//Check if asking for data out of bounds
 	if (pos >= v->length) {
-		return VECTOR_OUT_OF_BOUNDS_ERR;
+		return OUT_OF_BOUNDS_ERR;
 	}
 
 	if (pos < v->length - 1) {
@@ -84,10 +101,10 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 	v->vector = realloc(v->vector, v->length * v->data_size);
 	
 	if (v->vector == NULL) {
-		return VECTOR_MEM_ERR;
+		return MEM_ERR;
 	}
 
-	return VECTOR_SUCCESS;
+	return SUCCESS;
 }
 
 
@@ -96,29 +113,29 @@ int vector_get(vector_t * v, uint64_t pos, char * data) {
 
 	//Check for NULL
 	if (v == NULL) {
-		return VECTOR_NULL_ERR;
+		return NULL_ERR;
 	}
 
 	//Check if vector is empty
 	if (v->length == 0) {
-		return VECTOR_EMPTY_ERR;
+		return EMPTY_ERR;
 	}
 
 	//Check if asking for data out of bounds
 	if (pos >= v->length) {
-		return VECTOR_OUT_OF_BOUNDS_ERR;
+		return OUT_OF_BOUNDS_ERR;
 	}
 
 	//Allocate space and clear buffer;
 	if (realloc(data, v->data_size) == NULL) {
-		return VECTOR_NULL_ERR;
+		return NULL_ERR;
 	}
 	memset(data, 0, v->data_size);
 
 	//Get value
 	memcpy(data, v->vector + (pos * v->data_size), v->data_size);
 
-	return VECTOR_SUCCESS;
+	return SUCCESS;
 }
 
 
@@ -127,14 +144,14 @@ int vector_ini(vector_t * v, size_t data_size) {
 
 	//Check NULL
 	if (v == NULL || data_size == 0) {
-		return VECTOR_NULL_ERR;
+		return NULL_ERR;
 	}
 
 	v->vector = malloc(0);
 	v->data_size = data_size;
 	v->length = 0;
 
-	return VECTOR_SUCCESS;
+	return SUCCESS;
 }
 
 
@@ -143,12 +160,10 @@ int vector_end(vector_t * v) {
 
 	//Check NULL
 	if (v == NULL) {
-		return VECTOR_NULL_ERR;
+		return NULL_ERR;
 	}
 
-	if (v->length > 0) {
-		free(v->vector);
-	}
+	free(v->vector);
 
-	return VECTOR_SUCCESS;
+	return SUCCESS;
 }

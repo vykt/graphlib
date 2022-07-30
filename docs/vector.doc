@@ -28,8 +28,8 @@ initialised otherwise all functions called on it will fail.
 	
 	Returns:
 
-		VECTOR_SUCCESS  - Successful execution.
-		VECTOR_NULL_ERR - One or more necessary arguments are NULL.
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
 
 
 
@@ -44,13 +44,31 @@ memory it holds in the heap should be freed using the termination function.
 
 	Returns:
 
-		VECTOR_SUCCESS  - Successful execution.
-		VECTOR_NULL_ERR - One or more necessary arguments are NULL.
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
 
 
 
-Values can be added, removed and retrieved from the vector using the 3 operation
-functions.
+Values can be added, removed and retrieved or set from the vector using the 4
+operation functions.
+
+	vector_set():
+
+	Set an existing entry in the vector to a new value. Takes:
+
+		vector_t * v - Vector to operate on.
+
+		uint64_t pos - Index position to set value of.
+
+		char * data  - New value of entry.
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+
+	--- --- ---
 
 	vector_add():
 
@@ -69,11 +87,11 @@ functions.
 
 	Returns:
 
-		VECTOR_SUCCESS           - Successful execution.
-		VECTOR_NULL_ERR          - One or more necessary arguments are NULL.
-		VECTOR_FULL_ERR          - Vector is full.
-		VECTOR_OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
-		VECTOR_MEM_ERR           - Unable to reallocate vector heap memory.
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		FULL_ERR          - Vector is full.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		MEM_ERR           - Unable to reallocate vector heap memory.
 
 	--- --- ---
 
@@ -86,17 +104,18 @@ functions.
 
 	Returns:
 
-		VECTOR_SUCCESS           - Successful Execution.
-		VECTOR_NULL_ERR          - One or more necessary arguments are NULL.
-		VECTOR_EMPTY_ERR         - Vector is empty, unable to remove.
-		VECTOR_OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
-		VECTOR_MEM_ERR           - Unable to reallocate vector heap memory.
+		SUCCESS           - Successful Execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		EMPTY_ERR         - Vector is empty, unable to remove.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		MEM_ERR           - Unable to reallocate vector heap memory.
 
 	--- --- ---
 
-	vector_rmv():
+	vector_get():
 
-	Remove item from a vector. Takes:
+	Remove item from a vector. Note that data has to be a pointer to malloc'ed
+	memory. Takes:
 
 		vector_t * v - Vector to get from.
 		uint64_t pos - Position to get.
@@ -104,10 +123,10 @@ functions.
 
 	Returns:
 
-		VECTOR_SUCCESS           - Successful Execution.
-		VECTOR_NULL_ERR          - One or more necessary arguments are NULL.
-		VECTOR_EMPTY_ERR         - Vector is empty, unable to remove.
-		VECTOR_OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
+		SUCCESS           - Successful Execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		EMPTY_ERR         - Vector is empty, unable to remove.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
 
 
 
