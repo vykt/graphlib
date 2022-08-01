@@ -49,7 +49,7 @@ memory it holds in the heap should be freed using the termination function.
 
 
 
-Values can be added, removed and retrieved or set from the vector using the 4
+Values can be added, removed and retrieved or set from the vector using the 5
 operation functions.
 
 	vector_set():
@@ -128,6 +128,22 @@ operation functions.
 		EMPTY_ERR         - Vector is empty, unable to remove.
 		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
 
+	--- --- ---
+
+	vector_get_ref():
+
+	Remove item from a vector. Returns pointer to the data inside vector. Takes:
+
+		vector_t * v - Vector to get from.
+		uint64_t pos - Position to get.
+		char ** data  - Buffer to write data to.
+
+	Returns:
+
+		SUCCESS           - Successful Execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		EMPTY_ERR         - Vector is empty, unable to remove.
+		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
 
 
 Notes:

@@ -10,6 +10,7 @@
 #define GRAPH_NODE_NOT_VISITED 0
 #define GRAPH_NODE_VISITED 1
 
+
 typedef struct graph_node graph_node_t;
 
 struct graph_node {

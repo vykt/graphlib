@@ -30,7 +30,7 @@ int vector_set(vector_t * v, uint64_t pos, char * data) {
 int vector_add(vector_t * v, uint64_t pos, char * data, uint8_t append) {
 
 	//Check for NULL
-	if (v == NULL || data == NULL || v->data_size == 0) {
+	if (v == NULL || v->data_size == 0) {
 		return NULL_ERR;
 	}
 
@@ -64,9 +64,11 @@ int vector_add(vector_t * v, uint64_t pos, char * data, uint8_t append) {
 		);
 	}
 
-	//Add new entry
-	memcpy(v->vector + (pos * v->data_size), data, v->data_size);
-	
+	//Copy data over if necessary
+	if (data != NULL) {
+		memcpy(v->vector + (pos * v->data_size), data, v->data_size);
+	}
+
 	return SUCCESS;
 }
 
@@ -134,6 +136,31 @@ int vector_get(vector_t * v, uint64_t pos, char * data) {
 
 	//Get value
 	memcpy(data, v->vector + (pos * v->data_size), v->data_size);
+
+	return SUCCESS;
+}
+
+
+//TODO broken
+//Get element by reference
+int vector_get_ref(vector_t * v, uint64_t pos, char ** data) {
+	
+	//Check for NULL
+	if (v == NULL) {
+		return NULL_ERR;
+	}
+
+	//Check if vector is empty
+	if (v->length == 0) {
+		return EMPTY_ERR;
+	}
+
+	//Check if asking for data out of bounds
+	if (pos >= v->length) {
+		return OUT_OF_BOUNDS_ERR;
+	}
+
+	*data = v->vector + (pos * v->data_size);
 
 	return SUCCESS;
 }
