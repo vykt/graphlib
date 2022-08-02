@@ -9,10 +9,22 @@
 #include <stdio.h>
 
 
-void graph_node_set_dat(graph_node_t * n, char * data) {
+int graph_node_set_dat(graph_node_t * n, char * data, size_t data_size) {
+
+	n->data = realloc(n->data, data_size);
+	if (n->data == NULL) return MEM_ERR;
+	n->data_size = data_size;
 
 	memcpy(n->data, data, n->data_size);
 
+	return SUCCESS;
+}
+
+
+int graph_node_get_dat(graph_node_t * n, char ** data) {
+
+	memcpy(*data, n->data, n->data_size);
+	return SUCCESS;
 }
 
 

@@ -22,7 +22,12 @@ struct graph {
 int graph_add(graph_t * g, char * data, size_t data_size); //Add node
 int graph_rmv(); //Remove node
 
-int graph_get_dat(graph_t * g, uint64_t index, char ** dat);
+int graph_add_nbr();
+int graph_rmv_nbr();
+
+int graph_set_data(graph_t * g, uint64_t id, char * data, size_t data_size);
+int graph_get_data(graph_t * g, uint64_t id, char ** data);
+size_t graph_get_data_size(graph_t * g, uint64_t id);
 
 int graph_ini(graph_t * g);
 int graph_end(graph_t * g);

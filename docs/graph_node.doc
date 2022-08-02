@@ -29,7 +29,7 @@ be initialised, otherwise all other functions will fail.
 
 		size_t data_size - Size of data in node.
 
-		uint64_t         - ID of node.
+		uint64_t id      - ID of node.
 
 	Returns:
 

@@ -141,7 +141,6 @@ int vector_get(vector_t * v, uint64_t pos, char * data) {
 }
 
 
-//TODO broken
 //Get element by reference
 int vector_get_ref(vector_t * v, uint64_t pos, char ** data) {
 	

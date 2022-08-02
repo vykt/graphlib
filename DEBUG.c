@@ -9,50 +9,40 @@
 #include "graph.h"
 #include "error.h"
 
-void end() {
-	printf("uwu\n");
-}
 
 int main() {
 
 	int ret;
 	graph_t g;
-
-	//graph_node_t * node = malloc(sizeof(graph_node_t));
-
-	graph_node_t * node;
-
-	uint16_t dat = 75;
+	uint16_t dat;
+	size_t dat_size = sizeof(uint16_t);
 
 	ret = graph_ini(&g);
+	printf("graph init: %d\n", ret);
+
+	dat = 75;
+	ret = graph_add(&g, (char *) &dat, dat_size);
+	printf("graph add: %d\n", ret);
+
+	dat = 76;
+	ret = graph_add(&g, (char *) &dat, dat_size);
+	printf("graph add: %d\n", ret);
+
+	dat = 77;
+	ret = graph_add(&g, (char *) &dat, dat_size);
+	printf("graph add: %d\n", ret);
+
+	//ret = graph_rmv(&g, 1);
+
+	dat = 80;
+	uint64_t dat2 = 888888;
+	size_t dat2_size = sizeof(uint64_t);
+	ret = graph_set_data(&g, 1, (char *) &dat2, dat2_size);
+
+	uint64_t * dat2_get = malloc(dat2_size);
+	ret = graph_get_data(&g, 1, (char **) &dat2_get);
+
+	printf("dat_get: %lu\n", *dat2_get);
 	
-	ret = graph_add(&g, (char *) &dat, sizeof(uint16_t));
-	printf("add ret 1: %d\n", ret);
-	printf("VALUE! %u\n", (uint16_t) *(((graph_node_t *) g.nodes.vector)->data));
-
-	dat = 69;
-	ret = graph_add(&g, (char *) &dat, sizeof(uint16_t));
-	printf("add ret 2: %d\n", ret);
-	uint64_t index = 1;
-	printf("VALUE! %u\n", (uint16_t) *(((graph_node_t *) g.nodes.vector + (g.nodes.data_size * index))->data));
-
-	dat = 17;
-	ret = graph_add(&g, (char *) &dat, sizeof(uint16_t));
-	printf("add ret 3: %d\n", ret);
-	index = 1;
-	printf("VALUE! %u\n", (uint16_t) *(((graph_node_t *) g.nodes.vector + (g.nodes.data_size * index))->data));
-
-	uint16_t * dat2;
-	ret = graph_get_dat(&g, 0, (char **) &dat2);
-	//printf("VALUE 1? %u\n", *dat2);
-
-	ret = graph_get_dat(&g, 1, (char **) &dat2);
-	//printf("VALUE 2? %u\n", *dat2);
-
-	ret = graph_get_dat(&g, 2, (char **) &dat2);
-	//printf("VALUE 3? %u\n", *dat2);
-
-	end();
-
 	return 0;
 }

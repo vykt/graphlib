@@ -27,7 +27,9 @@ struct graph_node {
 };
 
 
-void graph_node_set_dat(graph_node_t * n, char * data);
+int graph_node_set_dat(graph_node_t * n, char * data, size_t data_size);
+int graph_node_get_dat(graph_node_t * n, char ** data);
+
 int graph_node_add_nbr(graph_node_t * n, graph_node_t * neighbour, int64_t weight);
 int graph_node_rmv_nbr(graph_node_t * n, uint64_t id);
 

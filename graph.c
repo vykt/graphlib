@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <stdint.h>
 
@@ -13,74 +14,108 @@
 #include <stdio.h>
 
 
-int graph_add(graph_t * g, char * data, size_t data_size) {
+//Get graph node pointer by id
+int get_graph_node_by_id(graph_t * g, uint64_t id, graph_node_t ** node) {
 
-	/*
-	 *	This function is very confusing so read this.
-	 *
-	 *	g->node.vector = Memory where all nodes live. It is dynamically allocated.
-	 *                   Therefore to add a new node, first it has to be expanded
-	 *                   to fit it in. This is why first, vector_add is called.
-	 *
-	 *  Once it is called, there is now all this space in memory but its empty. Now,
-	 *  the pointer to this memory can be passed to graph_node_ini to turn that
-	 *  memory into a graph_node. However, there are many nodes inside, how to get
-	 *  the correct pointer to this new memory? After all its not returned...
-	 *
-	 *	g->nodes.vector = All nodes. This is a POINTER.
-	 *	g->nodes.length = How many nodes there are. Minus 1 and its the index.
-	 *	                  The new node is always added to the end of the memory block.
-	 *	                  
-	 *  g->nodes.vector + (g->nodes.data_size * (g->nodes.length - 1))
-	 *
-	 *                        aka
-	 *
-	 *  Base pointer + Size of graph_node * Index of newest node (blank memory atm).
-	 */
+	int ret;
+	graph_node_t * temp_node;
+	
+	//For every node
+	for (uint64_t i = 0; i < g->nodes.length; i++) {
+
+		ret = vector_get_ref(&g->nodes, i, (char **) &temp_node);
+		if (ret != SUCCESS) return ret;
+
+		//If matched
+		if (temp_node->id == id) {
+			*node = temp_node;
+			return SUCCESS;
+		}
+	} //End for every node
+	return FAIL;
+}
+
+
+//Add new node to graph
+int graph_add(graph_t * g, char * data, size_t data_size) {
 
 	//Check for NULL
 	if (g == NULL || data == NULL || data_size == 0) return NULL_ERR;
 
 	int ret;
 
-	//Add entry for node
 	ret = vector_add(&g->nodes, 0, NULL, VECTOR_APPEND_TRUE);
 	if (ret != SUCCESS) return ret;
 
-	//g->nodes.vector[-1] (latest entry)
-	graph_node_t * init_p = 
-		(graph_node_t *) g->nodes.vector+(g->nodes.data_size * (g->nodes.length-1));
-	ret = graph_node_ini(init_p, data, data_size, g->next_id);
+	graph_node_t * new_node;
+	ret = vector_get_ref(&g->nodes, g->nodes.length - 1, (char **) &new_node);
 	if (ret != SUCCESS) return ret;
 
-	//Update graph tracking values
+	ret = graph_node_ini(new_node, data, data_size, g->next_id);
+	if (ret != SUCCESS) return ret;
+
 	g->next_id = g->next_id + 1;
-	
+
+	return SUCCESS;
+
+}
+
+
+//Remove node from graph, by ID
+//TODO: Also remove edge connections of neighours
+int graph_rmv(graph_t * g, uint64_t index) {
+
 	return SUCCESS;
 }
 
 
-int graph_rmv() {
+int graph_set_data(graph_t * g, uint64_t id, char * data, size_t data_size) {
+
+	int ret;
+	graph_node_t * node;
+
+	ret = get_graph_node_by_id(g, id, &node);
+	if (ret != SUCCESS) return ret;
+
+	ret = graph_node_set_dat(node, data, data_size);
+	if (ret != SUCCESS) return ret;
 
 	return SUCCESS;
+
 }
 
 
-int graph_get_dat(graph_t * g, uint64_t index, char ** dat) {
+int graph_get_data(graph_t * g, uint64_t id, char ** data) {
 
 	//Check for NULL
 	if (g == NULL) return NULL_ERR;
 
 	//Check index is in range
-	if (index >= g->nodes.length) return OUT_OF_BOUNDS_ERR;
+	if (id >= g->nodes.length) return OUT_OF_BOUNDS_ERR;
 
-	*dat = ((graph_node_t *) g->nodes.vector + (g->nodes.data_size * index))->data;
+	int ret;
+	graph_node_t * node;
 
-	printf("val: %u\n", (uint16_t) *(((graph_node_t *) g->nodes.vector + (g->nodes.data_size * index))->data));
+	ret = get_graph_node_by_id(g, id, &node);
+	if (ret != SUCCESS) return ret;
 
-	//printf("uwuuuuu %u\n", (uint16_t) **dat);
+	ret = graph_node_get_dat(node, data);
+
+	//memcpy(*data, node->data, node->data_size);
 
 	return SUCCESS;
+}
+
+
+size_t graph_get_data_size(graph_t * g, uint64_t id) {
+
+	int ret;
+	graph_node_t * node;
+
+	ret = get_graph_node_by_id(g, id, &node);
+	if (ret != SUCCESS) return ret;
+
+	return node->data_size;
 }
 
 
@@ -101,6 +136,10 @@ int graph_ini(graph_t * g) {
 
 
 int graph_end(graph_t * g) {
+
+	int ret;
+	ret = vector_end(&g->nodes);
+	if (ret != SUCCESS) return ret;
 
 	return SUCCESS;
 }

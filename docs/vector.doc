@@ -132,7 +132,7 @@ operation functions.
 
 	vector_get_ref():
 
-	Remove item from a vector. Returns pointer to the data inside vector. Takes:
+	Get item from a vector. Returns pointer to the data inside vector. Takes:
 
 		vector_t * v - Vector to get from.
 		uint64_t pos - Position to get.
