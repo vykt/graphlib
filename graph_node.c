@@ -52,6 +52,7 @@ int graph_node_add_nbr(graph_node_t * n, graph_node_t * n_add, int64_t weight) {
 }
 
 
+//Remove neighbour by id id_tgt from node pointed to by n
 int graph_node_rmv_nbr(graph_node_t * n, uint64_t id_tgt) {
 	
 	//Check for NULL

@@ -10,9 +10,6 @@
 #include "error.h"
 
 
-//TODO debug includes
-#include <stdio.h>
-
 
 //Get graph node pointer by id
 int get_graph_node_by_id(graph_t * g, uint64_t id, graph_node_t ** node) {
@@ -91,61 +88,52 @@ int graph_add(graph_t * g, char * data, size_t data_size) {
 }
 
 
-//Remove node from graph, by ID
-//TODO UNTESTED FUNCTION, TEST
+//Remove node from graph, by ID | TODO broken
 int graph_rmv(graph_t * g, uint64_t id) {
 
 	int ret;
-	graph_node_t * node;
-	graph_node_t ** node_nbr = malloc(sizeof(graph_node_t *));
+	graph_node_t * node; //Node to remove
+	graph_node_t ** node_nbr;
 	uint64_t index;
 
 	ret = get_graph_node_by_id(g, id, &node);
-	if (ret != SUCCESS) {
-		free(node_nbr);
-		return ret;
-	}
+	if (ret != SUCCESS) return ret;
 
 	//For every link
 	for (uint64_t i = 0; i < node->neighbours.length; i++) {
 	
 		//Get pointer to neighbour by index
-		ret = vector_get(&node->neighbours, i, (char *) node_nbr);
-		if (ret != SUCCESS) {
-			free(node_nbr);
-			return ret;
-		}
+		ret = vector_get_ref(&node->neighbours, i, (char **) &node_nbr);
+		if (ret != SUCCESS) return ret;
 
 		//Remove link to current node in neighbour
 		ret = graph_node_rmv_nbr(*node_nbr, id);
-		if (ret != SUCCESS) {
-			free(node_nbr);
-			return ret;
-		}
+		if (ret != SUCCESS) return ret;
 
 	} //End for every link
 
-	//Now, remove node itself
+	//TODO testing if still functional here
+	
+	graph_node_t * nbr_node;
+	int64_t weight;
+	ret = graph_node_get_nbr(*node_nbr, 0, &nbr_node, &weight);
+	
+
+	//TODO testing end
+
+
+	//Now, remove node itself     TODO problem somewhere here onwards
 	//Get its position in vector
 	ret = get_graph_node_index_by_id(g, id, &index);
-	if (ret != SUCCESS) {
-		free(node_nbr);
-		return ret;
-	}
+	if (ret != SUCCESS) return ret;
 
 	//Free memory used by vectors of node
 	ret = graph_node_end(node);
-	if (ret != SUCCESS) {
-		free(node_nbr);
-		return ret;
-	}
+	if (ret != SUCCESS) return ret;
 
 	//Remove itself from nodes vector
 	ret = vector_rmv(&g->nodes, index);
-	if (ret != SUCCESS) {
-		free(node_nbr);
-		return ret;
-	}
+	if (ret != SUCCESS) return ret;
 
 	return SUCCESS;
 }

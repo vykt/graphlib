@@ -6,7 +6,6 @@
 
 #include "error.h"
 
-
 #define VECTOR_APPEND_TRUE 1
 #define VECTOR_APPEND_FALSE 0
 

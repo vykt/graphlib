@@ -100,7 +100,7 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 	} //End if
 
 	v->length = v->length - 1;
-	v->vector = realloc(v->vector, v->length * v->data_size);
+	//v->vector = realloc(v->vector, v->length * v->data_size);
 
 	return SUCCESS;
 }
@@ -125,7 +125,7 @@ int vector_get(vector_t * v, uint64_t pos, char * data) {
 	}
 
 	//Allocate space and clear buffer;
-	if (realloc(data, v->data_size) == NULL) {
+	if ((data = realloc(data, v->data_size)) == NULL) {
 		return NULL_ERR;
 	}
 	memset(data, 0, v->data_size);

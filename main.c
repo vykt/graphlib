@@ -10,6 +10,9 @@
 #include "debug.h"
 #include "error.h"
 
+/*
+ *	This is a temporary, indev debug main file.
+ */
 
 int main() {
 
@@ -17,73 +20,121 @@ int main() {
 	graph_t g;
 	uint16_t dat;
 	size_t dat_size = sizeof(uint16_t);
-	graph_node_t * n;
+	link_t link;
+	int64_t w;
+	graph_node_t * node;
+	graph_node_t * nbr_node;
+
 
 	ret = graph_ini(&g);
 	printf("graph init: %d\n", ret);
 
-	dat = 75;
+	/*
+	 *	The following creates an example graph of 6 nodes, laid out in the
+	 *  following configuration. Each node stores the letter (e.g.: 'A') as
+	 *  its data. The number inside the brackets is that node's ID. The numbers
+	 *  on the edges represent the weight.
+	 *
+	 *  X 3=4 Y:  X to Y is weight 3, Y to X is weight 4
+	 *
+	 *  X -5- Y:  X to Y and Y to X both weight 5
+	 *
+	 *  Configuration of the example graph:
+	 *
+	 *  A(0) -5- B(1) 3=7 D(3)
+	 *  
+	 *   |        |        |
+	 *   3        2        5
+	 *   |        |        |
+	 *
+	 *  C(2) 6=4 E(4) -1- F(5)
+	 *
+	 */
+
+	//Creating nodes for graph
+	dat = 65;
 	ret = graph_add(&g, (char *) &dat, dat_size);
-	printf("graph add: %d\n", ret);
-
-	dat = 76;
+	dat = 66;
 	ret = graph_add(&g, (char *) &dat, dat_size);
-	printf("graph add: %d\n", ret);
-
-	dat = 77;
+	dat = 67;
 	ret = graph_add(&g, (char *) &dat, dat_size);
-	printf("graph add: %d\n", ret);
+	dat = 68;
+	ret = graph_add(&g, (char *) &dat, dat_size);
+	dat = 69;
+	ret = graph_add(&g, (char *) &dat, dat_size);
+	dat = 70;
+	ret = graph_add(&g, (char *) &dat, dat_size);
 
 
-	//CHANGING DATA VALUES
-	/*dat = 80;
-	uint64_t dat2 = 888888;
-	size_t dat2_size = sizeof(uint64_t);
-	ret = graph_set_data(&g, 1, (char *) &dat2, dat2_size);
-
-	uint64_t * dat2_get = malloc(dat2_size);
-	ret = graph_get_data(&g, 1, (char **) &dat2_get);
-
-	printf("dat_get: %lu\n", *dat2_get);
-
-	size_t size;
-	size = graph_get_data_size(&g, 1);
-	printf("size of data: %lu\n", size);
-	*/
-
-	//LINKING NODES
-	link_t link;
-	build_link(&link, 0, 1, 5, 8);
-
-	printf("id1: %lu, id2: %lu, w1: %ld, w2: %ld\n",
-		   link.id, link.id_target, link.weight_to, link.weight_from);
-
+	//Linking nodes
+	build_link(&link, 0, 1, 5, 5);
 	ret = graph_link_nodes(&g, link);
-	printf("link ret: %d\n", ret);
 
-	build_link(&link, 0, 2, 6, 6);
+	build_link(&link, 0, 2, 3, 3);
+	ret = graph_link_nodes(&g, link);
+
+	build_link(&link, 1, 3, 3, 7);
 	ret = graph_link_nodes(&g, link);
 	
-	//WORK PLS!
-	/*ret = get_graph_node_by_id(&g, 0, &n);
-	graph_node_t * nbr_node;
-	int64_t w = 0;
-
-	ret = graph_node_get_nbr(n, 0, &nbr_node, &w);
-	printf("Neighbour of node 0: id = %lu\n", nbr_node->id);
+	build_link(&link, 1, 4, 2, 2);
+	ret = graph_link_nodes(&g, link);
 	
-	ret = get_graph_node_by_id(&g, 0, &n);
-	ret = graph_node_get_nbr(n, 1, &nbr_node, &w);
-	printf("Neighbour of node 0: id = %lu\n", nbr_node->id);
+	build_link(&link, 2, 4, 6, 4);
+	ret = graph_link_nodes(&g, link);
 
-	ret = get_graph_node_by_id(&g, 1, &n);
-	ret = graph_node_get_nbr(n, 0, &nbr_node, &w);
+	build_link(&link, 3, 5, 5, 5);
+	ret = graph_link_nodes(&g, link);
+
+	build_link(&link, 4, 5, 1, 1);
+	ret = graph_link_nodes(&g, link);
+
+
+	//Checking node links
+	ret = get_graph_node_by_id(&g, 0, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	printf("Neighbour of node 0: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	printf("Neighbour of node 0: id = %lu\n", nbr_node->id);
+	printf("\n");
+
+	ret = get_graph_node_by_id(&g, 1, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
 	printf("Neighbour of node 1: id = %lu\n", nbr_node->id);
-	*/
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	printf("Neighbour of node 1: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 2, &nbr_node, &w);
+	printf("Neighbour of node 1: id = %lu\n", nbr_node->id);
+	printf("\n");
 
-	build_link(&link, 0, 1, 0, 0);
-	ret = graph_unlink_nodes(&g, link);
-	printf("Remove ret: %d\n", ret);
+	ret = get_graph_node_by_id(&g, 2, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	printf("Neighbour of node 2: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	printf("Neighbour of node 2: id = %lu\n", nbr_node->id);
+	printf("\n");
+
+	ret = get_graph_node_by_id(&g, 3, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	printf("Neighbour of node 3: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	printf("Neighbour of node 3: id = %lu\n", nbr_node->id);
+	printf("\n");
+
+	ret = get_graph_node_by_id(&g, 4, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	printf("Neighbour of node 4: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	printf("Neighbour of node 4: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 2, &nbr_node, &w);
+	printf("Neighbour of node 4: id = %lu\n", nbr_node->id);
+	printf("\n");
+
+	ret = get_graph_node_by_id(&g, 5, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	printf("Neighbour of node 5: id = %lu\n", nbr_node->id);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	printf("Neighbour of node 5: id = %lu\n", nbr_node->id);
+	printf("\n");
 
 	return 0;
 }
