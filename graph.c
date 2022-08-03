@@ -84,7 +84,6 @@ int graph_add(graph_t * g, char * data, size_t data_size) {
 	g->next_id = g->next_id + 1;
 
 	return SUCCESS;
-
 }
 
 

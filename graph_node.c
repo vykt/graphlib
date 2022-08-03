@@ -137,6 +137,7 @@ int graph_node_ini(graph_node_t * n, char * data, size_t data_size, uint64_t id)
     if (n->data == NULL) {        
         return MEM_ERR;
     }
+
 	n->data_size = data_size;
 	n->visited = GRAPH_NODE_NOT_VISITED;
 	n->id = id;
