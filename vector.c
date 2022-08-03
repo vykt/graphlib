@@ -100,7 +100,7 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 	} //End if
 
 	v->length = v->length - 1;
-	//v->vector = realloc(v->vector, v->length * v->data_size);
+	v->vector = realloc(v->vector, v->length * v->data_size);
 
 	return SUCCESS;
 }

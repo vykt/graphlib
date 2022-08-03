@@ -35,9 +35,11 @@ int main() {
 	 *  its data. The number inside the brackets is that node's ID. The numbers
 	 *  on the edges represent the weight.
 	 *
-	 *  X 3=4 Y:  X to Y is weight 3, Y to X is weight 4
+	 *  X 3=4 Y:  		X to Y is weight 3, Y to X is weight 4
 	 *
-	 *  X -5- Y:  X to Y and Y to X both weight 5
+	 *  X -5- Y:  		X to Y and Y to X both weight 5
+	 *
+	 *
 	 *
 	 *  Configuration of the example graph:
 	 *
@@ -135,6 +137,33 @@ int main() {
 	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
 	printf("Neighbour of node 5: id = %lu\n", nbr_node->id);
 	printf("\n");
+
+
+
+	
+	//Check (in GDB) all of A's neighbours before removing B
+	ret = get_graph_node_by_id(&g, 0, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+
+	//Check (in GDB) all of E's neighbours before removing B
+	ret = get_graph_node_by_id(&g, 4, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
+	ret = graph_node_get_nbr(node, 2, &nbr_node, &w);
+	
+	//Remove B from graph
+	ret = graph_rmv(&g, 1);
+	printf("Remove of ID 1: %d\n", ret);
+
+	//Check (in GDB) all of A's neighbours after removing B
+	ret = get_graph_node_by_id(&g, 0, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+
+	//Check (in GDB) all of E's neighbours after removing B
+	ret = get_graph_node_by_id(&g, 4, &node);
+	ret = graph_node_get_nbr(node, 0, &nbr_node, &w);
+	ret = graph_node_get_nbr(node, 1, &nbr_node, &w);
 
 	return 0;
 }
