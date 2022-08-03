@@ -101,10 +101,6 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 
 	v->length = v->length - 1;
 	v->vector = realloc(v->vector, v->length * v->data_size);
-	
-	if (v->vector == NULL) {
-		return MEM_ERR;
-	}
 
 	return SUCCESS;
 }

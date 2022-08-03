@@ -11,6 +11,9 @@
 
 int graph_node_set_dat(graph_node_t * n, char * data, size_t data_size) {
 
+	//Check NULL
+	if (n == NULL || data == NULL || data_size == 0) return NULL_ERR;
+
 	n->data = realloc(n->data, data_size);
 	if (n->data == NULL) return MEM_ERR;
 	n->data_size = data_size;
@@ -23,67 +26,101 @@ int graph_node_set_dat(graph_node_t * n, char * data, size_t data_size) {
 
 int graph_node_get_dat(graph_node_t * n, char ** data) {
 
+	//Check NULL
+	if (n == NULL || data == NULL) return NULL_ERR;
+
 	memcpy(*data, n->data, n->data_size);
 	return SUCCESS;
 }
 
 
-int graph_node_add_nbr(graph_node_t * n, graph_node_t * neighbour, int64_t weight) {
+int graph_node_add_nbr(graph_node_t * n, graph_node_t * n_add, int64_t weight) {
 
 	//Check for NULL
-	if (n == NULL || neighbour == NULL) {
-		return NULL_ERR;
-	}
+	if (n == NULL || n_add == NULL) return NULL_ERR;
 
-	//Try add neighbour
 	int ret;
-	ret = vector_add(&n->neighbours, 0, (char *) neighbour, VECTOR_APPEND_TRUE);
-	if (ret != SUCCESS) {
-		return ret;
-	}
-	//Tru add weight
-	ret = vector_add(&n->edge_weights, 0, (char *) &weight, VECTOR_APPEND_TRUE);
-	if (ret != SUCCESS) {
-		return ret;
-	}
+
+	//Write to vectors
+	ret = vector_add(&n->neighbours, 0, (char *) &n_add, VECTOR_APPEND_TRUE);
+	if (ret != SUCCESS) return ret;
+
+	ret = vector_add(&n->edge_weights, 0, NULL, VECTOR_APPEND_TRUE);
+	if (ret != SUCCESS) return ret;
 
 	return SUCCESS;
-
 }
 
 
-int graph_node_rmv_nbr(graph_node_t * n, uint64_t id) {
-
+int graph_node_rmv_nbr(graph_node_t * n, uint64_t id_tgt) {
+	
 	//Check for NULL
-	if (n == NULL) {
-		return NULL_ERR;
-	}
-
-	//Find neighbour by ID
+	if (n == NULL) return NULL_ERR;
+	
 	int ret;
-	graph_node_t graph_node_searched;
-	for (int i = 0; i < n->neighbours.length; i++) {
+	graph_node_t ** nbr = malloc(sizeof(graph_node_t *));
+	int64_t * weight = malloc(sizeof(int64_t));
 
-		//Get next neighbour
-		ret = vector_get(&n->neighbours, i, (char *) &graph_node_searched);
+	//For every neighbour
+	for (uint64_t i = 0; i < n->neighbours.length; i++) {
+
+		ret = vector_get(&n->neighbours, i, (char *) nbr);
 		if (ret != SUCCESS) {
+			free(nbr);
+			free(weight);
 			return ret;
 		}
-		//If IDs match
-		if (graph_node_searched.id == id) {
+
+		//If ID matches with target
+		if ((*nbr)->id == id_tgt) {
 			ret = vector_rmv(&n->neighbours, i);
 			if (ret != SUCCESS) {
-				return GRAPH_NODE_RMV_NEIGHBOUR_ERR;
+				free(nbr);
+				free(weight);
+				return ret;
 			}
-			ret = vector_rmv(&n->edge_weights, i);
+			ret = vector_rmv(&n->edge_weights, i);	
 			if (ret != SUCCESS) {
-				return GRAPH_NODE_RMV_WEIGHT_ERR;
+				free(nbr);
+				free(weight);
+				return ret;
 			}
+			free(nbr);
+			free(weight);
 			return SUCCESS;
-		} //End if IDs match
+		}
+	} //End for every vector
 
-	} //End for
+	free(nbr);
+	free(weight);
 	return FAIL;
+}
+
+
+int graph_node_get_nbr(graph_node_t * n, uint64_t index, graph_node_t ** nbr, int64_t * weight) {
+
+	//Check for NULL
+	if (n == NULL) return NULL_ERR;
+
+	int ret;
+
+	graph_node_t ** temp_node = malloc(sizeof(graph_node_t *));
+	int64_t * temp_weight = malloc(sizeof(int64_t));
+	
+	ret = vector_get(&n->neighbours, index, (char *) temp_node);
+	if (ret != SUCCESS) return ret;
+
+	ret = vector_get(&n->edge_weights, index, (char *) temp_weight);
+	if (ret != SUCCESS) return ret;
+
+	//Copy data over so the caller can use it.
+	*nbr = *temp_node;
+	*weight = *temp_weight;
+	
+	//Free read buffers and return
+	free(temp_node);
+	free(temp_weight);
+	return SUCCESS;
 }
 
 
