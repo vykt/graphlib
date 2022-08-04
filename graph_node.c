@@ -34,20 +34,29 @@ int graph_node_get_dat(graph_node_t * n, char ** data) {
 }
 
 
-int graph_node_add_nbr(graph_node_t * n, graph_node_t * n_add, int64_t weight) {
+int graph_node_add_nbr(graph_node_t * n, uint64_t n_add_id, int64_t weight) {
 
 	//Check for NULL
-	if (n == NULL || n_add == NULL) return NULL_ERR;
+	if (n == NULL) return NULL_ERR;
 
 	int ret;
+	uint64_t * id_mem = malloc(sizeof(uint64_t));
+	if (id_mem == NULL) return MEM_ERR;
+	int64_t * weight_mem = malloc(sizeof(int64_t));
+	if (weight_mem == NULL) return MEM_ERR;
+
+	memcpy(id_mem, &n_add_id, sizeof(uint64_t));
+	memcpy(weight_mem, &weight, sizeof(int64_t));
 
 	//Write to vectors
-	ret = vector_add(&n->neighbours, 0, (char *) &n_add, VECTOR_APPEND_TRUE);
+	ret = vector_add(&n->neighbours, 0, (char *) id_mem, VECTOR_APPEND_TRUE);
 	if (ret != SUCCESS) return ret;
 
-	ret = vector_add(&n->edge_weights, 0, NULL, VECTOR_APPEND_TRUE);
+	ret = vector_add(&n->edge_weights, 0, (char *) weight_mem, VECTOR_APPEND_TRUE);
 	if (ret != SUCCESS) return ret;
 
+	free(id_mem);
+	free(weight_mem);
 	return SUCCESS;
 }
 
@@ -57,70 +66,83 @@ int graph_node_rmv_nbr(graph_node_t * n, uint64_t id_tgt) {
 	
 	//Check for NULL
 	if (n == NULL) return NULL_ERR;
-	
+
 	int ret;
-	graph_node_t ** nbr = malloc(sizeof(graph_node_t *));
+	uint64_t * id_nbr = malloc(sizeof(uint64_t));
 	int64_t * weight = malloc(sizeof(int64_t));
 
 	//For every neighbour
 	for (uint64_t i = 0; i < n->neighbours.length; i++) {
 
-		ret = vector_get(&n->neighbours, i, (char *) nbr);
+		ret = vector_get(&n->neighbours, i, (char *) id_nbr);
 		if (ret != SUCCESS) {
-			free(nbr);
+			free(id_nbr);
 			free(weight);
 			return ret;
 		}
 
 		//If ID matches with target
-		if ((*nbr)->id == id_tgt) {
+		if (*id_nbr == id_tgt) {
 			ret = vector_rmv(&n->neighbours, i);
 			if (ret != SUCCESS) {
-				free(nbr);
+				free(id_nbr);
 				free(weight);
 				return ret;
 			}
 			ret = vector_rmv(&n->edge_weights, i);	
 			if (ret != SUCCESS) {
-				free(nbr);
+				free(id_nbr);
 				free(weight);
 				return ret;
 			}
-			free(nbr);
+			free(id_nbr);
 			free(weight);
 			return SUCCESS;
 		}
 	} //End for every vector
 
-	free(nbr);
+	free(id_nbr);
 	free(weight);
 	return FAIL;
 }
 
 
-int graph_node_get_nbr(graph_node_t * n, uint64_t index, graph_node_t ** nbr, int64_t * weight) {
+int graph_node_get_nbr_id(graph_node_t * n, uint64_t index, uint64_t * nbr_id, int64_t * w) {
 
 	//Check for NULL
 	if (n == NULL) return NULL_ERR;
 
 	int ret;
 
-	graph_node_t ** temp_node = malloc(sizeof(graph_node_t *));
+	uint64_t * temp_nbr_id = malloc(sizeof(uint64_t));
+	if (temp_nbr_id == NULL) return MEM_ERR;
+
 	int64_t * temp_weight = malloc(sizeof(int64_t));
+	if (temp_weight == NULL) {
+		free(temp_nbr_id);
+		return MEM_ERR;
+	}
+
 	
-	ret = vector_get(&n->neighbours, index, (char *) temp_node);
-	if (ret != SUCCESS) return ret;
+	ret = vector_get(&n->neighbours, index, (char *) temp_nbr_id);
+	if (ret != SUCCESS) {
+		free(temp_nbr_id);
+		free(temp_weight);
+		return ret;	
+	}
 
 	ret = vector_get(&n->edge_weights, index, (char *) temp_weight);
-	if (ret != SUCCESS) return ret;
+	if (ret != SUCCESS) {
+		free(temp_nbr_id);
+		free(temp_weight);
+		return ret;	
+	}
 
-	//Copy data over so the caller can use it.
-	*nbr = *temp_node;
-	*weight = *temp_weight;
-	
+	*nbr_id = *temp_nbr_id;
+	*w = *temp_weight;
+
 	//Free read buffers and return
-	free(temp_node);
-	free(temp_weight);
+	free(temp_nbr_id);
 	return SUCCESS;
 }
 
@@ -146,7 +168,7 @@ int graph_node_ini(graph_node_t * n, char * data, size_t data_size, uint64_t id)
 	//Init vectors
 	int ret;
 
-	ret = vector_ini(&n->neighbours, sizeof(graph_node_t *));
+	ret = vector_ini(&n->neighbours, sizeof(uint64_t));
 	if (ret == NULL_ERR) {
 		return NULL_ERR;
 	}

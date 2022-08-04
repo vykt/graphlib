@@ -110,9 +110,9 @@ int graph_link_nodes(graph_t * g, link_t link) {
 	if (ret != SUCCESS) return ret;
 
 	//Add neighbours to both nodes
-	ret = graph_node_add_nbr(node, node_tgt, link.weight_to);
+	ret = graph_node_add_nbr(node, link.id_target, link.weight_to);
 	if (ret != SUCCESS) return ret;
-	ret = graph_node_add_nbr(node_tgt, node, link.weight_from);
+	ret = graph_node_add_nbr(node_tgt, link.id, link.weight_from);
 	if (ret != SUCCESS) return ret;
 
 	return SUCCESS;
