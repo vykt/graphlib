@@ -57,6 +57,7 @@ neighbouring nodes.
 Upon creation of a node, neighbours can be added or removed to/from it. Its data value
 can also be changed.
 
+
 	graph_node_set_dat():
 
 	Set the data value of a node. Takes:
@@ -65,9 +66,27 @@ can also be changed.
 
 		char * data      - Data to set.
 
-	Returns:
+		size_t data_size - Size of data to set.
 
-		Nothing.
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+
+	--- --- ---
+
+	graph_node_get_dat():
+
+	Get the data value of a node. Takes:
+
+		graph_node_t * n - Subject graph node.
+
+		char ** data      - Data buffer pointer to write to.
+
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
 
 	--- --- ---
 
@@ -77,7 +96,7 @@ can also be changed.
 
 		graph_node_t * n         - Subject graph node.
 
-		graph_node_t * neighbour - Pointer to neighbour node.
+		uint64_t n_add_id        - Id of neighbour node.
 
 		int64_t weight           - Weight of edge to neighbour.
 
@@ -85,8 +104,6 @@ can also be changed.
 
 		SUCCESS           - Successful execution.
 		NULL_ERR          - One or more necessary arguments are NULL.
-		FULL_ERR          - Vector is full.
-		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
 		MEM_ERR           - Unable to allocate/reallocate heap memory.
 
 	--- --- ---
@@ -95,14 +112,31 @@ can also be changed.
 
 	Remove neighour from a node. Takes:
 
-		graph_node_t * n - Subject graph node.
-		uint64_t id      - ID of neighbour node to remove.
+		graph_node_t * n     - Subject graph node.
+		uint64_t id_tgt      - ID of neighbour node to remove.
 
 	Returns:
 
 		SUCCESS           - Successful execution.
 		FAIL              - Unable to remove neighbour, no ID match.
 		NULL_ERR          - One or more necessary arguments are NULL.
-		FULL_ERR          - Vector is full.
-		OUT_OF_BOUNDS_ERR - Attemting to remove index out of range.
 		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_node_get_nbr_id():
+
+	Get id of neighour by index. Takes:
+
+		graph_node_t * n  - Subject graph node.
+		uint64_t index    - Index of neighbour.
+		uint64_t * nbr_id - Pointer to data where neighbour ID is stored.
+		int64_t * w       - Weight of connection to neighbour node.
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to get neighbour, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+

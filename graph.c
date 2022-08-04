@@ -88,6 +88,91 @@ int graph_add(graph_t * g, char * data, size_t data_size) {
 }
 
 
+//Remove node from graph
+int graph_rmv(graph_t * g, uint64_t id) {
+
+	//Check for NULL
+	if (g == NULL) return NULL_ERR;
+
+	int ret;
+	graph_node_t * node;
+	graph_node_t * nbr_node;
+	uint64_t index;
+	uint64_t * id_mem = malloc(sizeof(uint64_t));
+	if (id_mem == NULL) return MEM_ERR;
+
+	//Fetch node to remove
+	ret = get_graph_node_by_id(g, id, &node);
+	if (ret != SUCCESS) {
+		free(id_mem);
+		return ret;
+	}
+
+	//Unlink node at ID from every neighbour
+	//For every neighbour
+	for (uint64_t i = 0; i < node->neighbours.length; i++) {
+		
+		//Get neighbour ID
+		ret = vector_get(&node->neighbours, i, (char *) id_mem);
+		if (ret != SUCCESS) {
+			free(id_mem);
+			return ret;
+		}
+
+		//Get neighbour node
+		ret = get_graph_node_by_id(g, *id_mem, &nbr_node);	
+		if (ret != SUCCESS) {
+			free(id_mem);
+			return ret;
+		}
+
+		//Scan neighbours until node ID is found
+		//For every neighbour of neighbour node
+		for (uint64_t j = 0; j < nbr_node->neighbours.length; j++) {
+	
+			//Get neighbour ID
+			ret = vector_get(&nbr_node->neighbours, j, (char *) id_mem);
+			if (ret != SUCCESS) {
+				free(id_mem);
+				return ret;
+			}
+
+			//If neighbour ID matches node's ID
+			if (*id_mem == node->id) {
+				//Remove neighbour
+				ret = vector_rmv(&nbr_node->neighbours, j);	
+				if (ret != SUCCESS) {
+					free(id_mem);
+					return ret;
+				}
+				ret = vector_rmv(&nbr_node->edge_weights, j);	
+				if (ret != SUCCESS) {
+					free(id_mem);
+					return ret;
+				}
+			} //End if neighbour ID matches node's ID
+		} //End for every neighbour of neighbour node
+	} //End for every neighbour
+
+	//Now, terminate node
+	ret = graph_node_end(node);
+	if (ret != SUCCESS) {
+		free(id_mem);
+		return ret;
+	}
+
+	free(id_mem);
+	//Remove node from graph
+	ret = get_graph_node_index_by_id(g, id, &index);
+	if (ret != SUCCESS) return ret;
+
+	ret = vector_rmv(&g->nodes, index);
+	if (ret != SUCCESS) return ret;
+
+	return SUCCESS;
+}
+
+
 //Build connection link
 void build_link(link_t * link, uint64_t id, uint64_t id_tgt, int64_t w_to, int64_t w_fr) {
 	link->id = id;
@@ -128,7 +213,6 @@ int graph_unlink_nodes(graph_t * g, link_t link) {
 	//Get pointers to both nodes if possible
 	ret = get_graph_node_by_id(g, link.id, &node);
 	if (ret != SUCCESS) return ret;
-
 	ret = get_graph_node_by_id(g, link.id_target, &node_tgt);
 	if (ret != SUCCESS) return ret;
 
@@ -209,6 +293,9 @@ int graph_ini(graph_t * g) {
 
 
 int graph_end(graph_t * g) {
+
+	//Check for NULL
+	if (g == NULL) return NULL_ERR;
 
 	int ret;
 	ret = vector_end(&g->nodes);

@@ -33,6 +33,8 @@ int get_graph_node_by_id(graph_t * g, uint64_t id, graph_node_t ** node);
 int get_graph_node_index_by_id(graph_t * g, uint64_t id, uint64_t * index);
 
 int graph_add(graph_t * g, char * data, size_t data_size); //Add node
+int graph_rmv(graph_t * g, uint64_t id);
+
 void build_link(link_t * link, uint64_t id, uint64_t id_tgt, int64_t w_to, int64_t w_fr);
 int graph_link_nodes(graph_t * g, link_t link);
 int graph_unlink_nodes(graph_t * g, link_t link);

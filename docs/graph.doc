@@ -1,0 +1,221 @@
+vykt's graph library - graph
+----------------------------------
+
+	graph_t:
+
+	The graph node type, creates a graph_node struct with members:
+
+		vector_t nodes   - Vector of pointers to graph_node_t nodes.
+
+		uint64_t next_id - ID to give to next created node.
+
+
+To create a graph, define a graph struct using graph_t type. Once done, the graph
+needs to be initialised via the builder function. The graph must be initialised,
+otherwise all other functions will fail.
+
+	graph_ini():
+
+	Graph initialiser function. Takes:
+
+		graph_t * g - Graph to initialise.
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+
+
+If a graph ever needs to be terminated, the graph_end() function should be used to
+free any allocated memory.
+
+	graph_end():
+
+	Graph terminator function. Takes:
+
+		graph_t * g - Graph to terminate.
+
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		NULL_ERR          - One or more necessary arguments are NULL.
+
+
+Upon creation of a graph, nodes can be added and removed from it. Nodes can also
+be linked, unlinked and fetched based on ID or index. Their data can also be set
+and retrieved.
+
+	get_graph_node_by_id():
+
+	Retrieve a pointer to a node with a given id. Takes:
+
+		graph_t * g          - Graph to fetch node from.
+
+		uint64_t id          - ID of node to fetch.
+
+		graph_node_t ** node - Double pointer to some node, gets set to desired
+		                       node on success.
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to get node, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+
+	--- --- ---
+
+	get_graph_node_index_by_id():
+
+	Get the index of node with given ID inside the vector storing it. Takes:
+
+		graph_t * g      - Graph to search in.
+
+		uint64_t id      - ID of node.
+
+		uint64_t * index - Pointer to where index is stored.
+
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to get index.
+		NULL_ERR          - One or more necessary arguments are NULL.
+
+	--- --- ---
+
+	graph_add():
+
+	Add node to graph. Takes:
+
+		graph_t * g      - Graph to add to.
+
+		char * data      - Pointer to data to add.
+
+		size_t data_size - Size of data to be added.
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to perform action, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_rmv():
+
+	Remove a node from graph and unlink it from all neighbours. Takes:
+
+		graph_t * g - Graph to operate on.
+		uint64_t id - ID of node to remove.
+
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to perform action, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_build_link():
+
+	Build a link struct used when linking or unlinking two nodes. Takes:
+
+		link_t * link   - Pointer to link struct to populate.
+		uint64_t id     - ID of first node.
+		uint64_t id_tgt - ID of second node.
+		int64_t w_to    - Weight of edge from first node to second node.
+		int64_t w_fr    - Weight of edge from second node to first node.
+
+	Returns:
+
+		Void.
+
+	It should be noted that when used to unlink, w_to and w_fr are ignored.
+
+	--- --- ---
+
+	graph_link_nodes():
+
+	Link two nodes together. Takes:
+
+		graph_t * g - Graph to operate on.
+		link_t link - Link struct storing data about the link. See build_link().
+
+	Returns:
+
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to perform action, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_unlink_nodes():
+
+	Unlink two nodes. Takes:
+
+		graph_t * g - Graph to operate on.
+		link_t link - Link struct storing data identifying the link. See build_link().
+
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to perform action, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_set_data():
+
+	Set data of node identified by ID on graph. Takes:
+
+		graph_t * g      - Graph to operate on.
+		uint64_t id      - ID of target node.
+		char * data      - Pointer to malloc'ed memory storing data set into node.
+		size_t data_size - Size of data.
+
+	Returns:
+	
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to perform action, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_get_data():
+
+	Get data of node identified by ID on graph. Takes:
+
+		graph_t * g  - Graph to operate on.
+		uint64_t id  - ID of node to fetch data from.
+		char ** data - Double pointer to malloc'ed memory where read data is stored.
+
+	Returns:
+		
+		SUCCESS           - Successful execution.
+		FAIL              - Unable to perform action, no ID match.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate/reallocate heap memory.
+
+	--- --- ---
+
+	graph_get_data_size():
+
+	Get size of data currently stored inside node identified by ID. Takes:
+
+		graph_t * g - Graph to operate on.
+		uint64_t id - ID of node.
+
+	Returns:
+
+		On success:
+
+			(size_t) Size of data.
+
+		On error:
+
+			FAIL              - Unable to perform action, no ID match.
+			NULL_ERR          - One or more necessary arguments are NULL.
+			MEM_ERR           - Unable to allocate/reallocate heap memory.

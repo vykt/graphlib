@@ -139,17 +139,5 @@ int main() {
 	printf("Neighbour of node 5: id = %lu\n", nbr_id);
 	printf("\n");
 
-
-	ret = get_graph_node_by_id(&g, 3, &node);
-	ret = graph_node_get_nbr_id(node, 0, &nbr_id, &w);
-	
-	build_link(&link, 3, nbr_id, 0, 0);
-	graph_unlink_nodes(&g, link);
-
-
-	ret = graph_node_get_nbr_id(node, 0, &nbr_id, &w);
-	ret = get_graph_node_by_id(&g, nbr_id, &nbr_node);
-	
-
 	return 0;
 }
