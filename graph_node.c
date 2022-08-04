@@ -141,11 +141,6 @@ int graph_node_ini(graph_node_t * n, char * data, size_t data_size, uint64_t id)
 	n->visited = GRAPH_NODE_NOT_VISITED;
 	n->id = id;
 
-	//Set data
-	n->data = malloc(n->data_size);
-	if (n->data == NULL) {
-		return NULL_ERR;
-	}
 	memcpy(n->data, data, data_size);
 
 	//Init vectors
