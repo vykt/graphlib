@@ -91,6 +91,12 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 		return OUT_OF_BOUNDS_ERR;
 	}
 
+	/*
+	 *	To this day I can't figure out if memove() breaks the program or not.
+	 *	My most recent testing shows it working as intended, however I'm still
+	 *	not entirely convinced.
+	 */
+
 	if (pos < v->length - 1) {
 		memmove(
 			v->vector + (pos * v->data_size),
