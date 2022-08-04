@@ -100,6 +100,7 @@ int vector_rmv(vector_t * v, uint64_t pos) {
 	} //End if
 
 	v->length = v->length - 1;
+	//Might use space in future, no dealloc
 	v->vector = realloc(v->vector, v->length * v->data_size);
 
 	return SUCCESS;
