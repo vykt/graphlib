@@ -5,8 +5,8 @@
 #include "graph_node.h"
 
 
-typedef struct search_node search_node_t;
-typedef struct path path_t;
+typedef struct search_node s_node_t;
+typedef struct path_req path_req_t;
 
 
 struct search_node {
@@ -16,11 +16,10 @@ struct search_node {
 
 	int64_t cost;
 	uint8_t visited;
-
 };
 
 
-struct path {
+struct path_req {
 
 	uint64_t start_id;
 	uint64_t end_id;
