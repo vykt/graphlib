@@ -167,6 +167,33 @@ int vector_get_ref(vector_t * v, uint64_t pos, char ** data) {
 }
 
 
+//Move element
+int vector_mov(vector_t * v, uint64_t pos, uint64_t pos_new) {
+
+	if (pos == pos_new) return SUCCESS;
+
+	int ret;
+	char * data = malloc(v->data_size);
+	if (data == NULL) return MEM_ERR;
+
+	ret = vector_get(v, pos, data);
+	if (ret != SUCCESS) { free(data); return ret; }
+
+	ret = vector_rmv(v, pos);
+	if (ret != SUCCESS) { free(data); return ret; }
+
+	if (pos > pos_new) {
+		ret = vector_add(v, pos_new, data, VECTOR_APPEND_FALSE);
+	} else {
+		ret = vector_add(v, pos_new - 1, data, VECTOR_APPEND_FALSE);
+	}
+	if (ret != SUCCESS) { free(data); return ret; }
+
+	free(data);
+	return SUCCESS;
+}
+
+
 //Start vector
 int vector_ini(vector_t * v, size_t data_size) {
 

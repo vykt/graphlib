@@ -15,8 +15,18 @@
  */
 
 
-//Pathfind
-int dijkstra_pathfind() {
+//Pathfind using dijkstra's, non recursively this time
+int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
+
+	int ret;
+	s_node_t * s_node;
+
+	//For every node on the graph
+	for (uint64_t i = 0; i < s_graph->graph->nodes.length; i++) {
+
+		ret = 0; //TODO finish
+
+	} //End for every node
 
 	return SUCCESS;
 }
@@ -35,22 +45,29 @@ int s_node_ini(graph_t * g, s_node_t * s_node, graph_node_t * node) {
 }
 
 
-//Initialise main search structure
-int search_queue_ini(graph_t * g, vector_t * s_queue) {
+/*
+ *  Wrap every node in graph with search metadata. Push all nodes on queue,
+ *  move starting node to beginning of queue.
+ */
+
+//Initialise graph search structure
+int search_graph_ini(path_req_t * p, graph_t * g, s_graph_t * s_graph) {
 
 	int ret;
 	graph_node_t * temp_node;
 	s_node_t * s_mem = malloc(sizeof(s_node_t));
 	if (s_mem == NULL) return MEM_ERR;
 
-	ret = vector_ini(s_queue, sizeof(s_node_t));
-	if (ret == SUCCESS) return ret;
+	s_graph->graph = g;
+
+	ret = vector_ini(&s_graph->s_queue, sizeof(s_node_t));
+	if (ret != SUCCESS) return ret;
 
 	//For every graph node, add an entry to queue and build it
-	for (uint64_t i; i < g->nodes.length; i++) {
+	for (uint64_t i = 0; i < g->nodes.length; i++) {
 
 		//Expand vector
-		ret = vector_add(s_queue, 0, NULL, VECTOR_APPEND_TRUE);
+		ret = vector_add(&s_graph->s_queue, 0, NULL, VECTOR_APPEND_TRUE);
 		if (ret != SUCCESS) { free(s_mem); return ret; }
 
 		//Create next s_node & initialise it
@@ -60,10 +77,27 @@ int search_queue_ini(graph_t * g, vector_t * s_queue) {
 		if (ret != SUCCESS) { free(s_mem); return ret; }
 
 		//Add new s_node to search queue (for now, default order)
-		ret = vector_set(s_queue, i, (char *) s_mem);
+		ret = vector_set(&s_graph->s_queue, i, (char *) s_mem);
+
+		//If ID matches start, move to index 0
+		if (s_mem->node->id == p->start_id) {
+			ret = vector_mov(&s_graph->s_queue, i, 0);
+			if (ret != SUCCESS) { free(s_mem); return ret; }
+		}
 
 	} //End for every graph node
-	
+
+	return SUCCESS;
+}
+
+
+//End graph search structure
+int search_graph_end(s_graph_t * s_graph) {
+
+	int ret;
+	ret = vector_end(&s_graph->s_queue);
+	if (ret != SUCCESS) return ret;
+
 	return SUCCESS;
 }
 

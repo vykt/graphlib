@@ -7,6 +7,7 @@
 #include "vector.h"
 #include "graph_node.h"
 #include "graph.h"
+#include "traverse.h"
 #include "debug.h"
 #include "error.h"
 
@@ -138,6 +139,22 @@ int main() {
 	ret = graph_node_get_nbr_id(node, 1, &nbr_id, &w);
 	printf("Neighbour of node 5: id = %lu\n", nbr_id);
 	printf("\n");
+
+
+	//TESTING
+	path_req_t p;
+	s_graph_t s_graph;
+	s_node_t * s_node;
+
+	ret = path_req_ini(&p, 2, 3);
+	printf("Initialise path request: %d\n", ret);
+
+	ret = search_graph_ini(&p, &g, &s_graph);
+	printf("Initialise search graph: %d\n", ret);
+
+	for (uint64_t i = 0; i < g.nodes.length; i++) {
+		ret = vector_get_ref(&s_graph.s_queue, i, (char **) &s_node);
+	}
 
 	return 0;
 }
