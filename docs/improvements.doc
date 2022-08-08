@@ -1,0 +1,12 @@
+Below is a list of future modifications to the code to reduce runtime complexity
+or improve reliability:
+
+1) search node type, s_node_t, should store its own index inside the search queue, 
+s_queue. This would avoid having to search through all nodes of the graph for a
+match.
+
+2) Another struct should be created where a vector is used to store pointers to
+search nodes, s_node_t. IDs of search nodes can be used as indexes in this vector.
+This would once again remove the need to search through the graph sequentially,
+reducing complexity. This vector would need to be constructed at time of search,
+as modification of the graph will likely lead to invalidating some entries.

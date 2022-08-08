@@ -156,5 +156,21 @@ int main() {
 		ret = vector_get_ref(&s_graph.s_queue, i, (char **) &s_node);
 	}
 
+	//TODO: TEST
+	//
+	//queue_smart_insert()
+	
+	ret = get_s_node_by_id(&s_graph, 4, &s_node);
+	s_node->cost = 11;
+
+	ret = queue_smart_move(&s_graph.s_queue, s_node);
+	
+	for (uint64_t i = 0; i < g.nodes.length; i++) {
+		ret = vector_get_ref(&s_graph.s_queue, i, (char **) &s_node);
+	}
+	
+	
+	//dijkstra_pathfind()
+
 	return 0;
 }
