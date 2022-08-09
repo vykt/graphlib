@@ -36,6 +36,9 @@ struct path_req {
 
 
 int queue_smart_move(vector_t * s_queue, s_node_t * s_node);
+
+int get_cur_weight(s_node_t * s_node, s_node_t * s_start_node, int64_t * cur_weight);
+int get_nbr_index_by_id(s_node_t * s_node, uint64_t id, uint64_t * index);
 int get_index_by_s_node(vector_t * s_queue, s_node_t * s_node, uint64_t * index); 
 int get_s_node_by_id(s_graph_t * s_graph, uint64_t id, s_node_t ** s_node);
 

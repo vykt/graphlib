@@ -46,6 +46,69 @@ int queue_smart_move(vector_t * s_queue, s_node_t * s_node) {
 }
 
 
+int get_cur_weight(s_node_t * s_node, s_node_t * s_start_node, int64_t * cur_weight) {
+
+	int ret;
+	int index;
+	int64_t * weight;
+
+	//If no more previous nodes
+	if (s_node->prev_search_node == NULL) {
+		
+		//If final matches start node
+		if (s_node == s_start_node) {
+			return SUCCESS;
+		
+		//Else final node doesn't match start node
+		} else {
+			return FAIL;
+		}	
+		
+	//If there are more previous nodes
+	} else {
+		
+		//Get index of prev node
+		ret = get_nbr_index_by_id(s_node->prev_search_node, s_node->node->id, &index);
+		if (ret != SUCCESS) return ret;
+
+		//Get weight of edge from prev node to this node
+		ret = vector_get_ref(&s_node->prev_search_node->node->edge_weights, index,
+				             (char **) &weight);
+
+		//Add weight of this edge to the total cost
+		*cur_weight = *cur_weight + *weight;
+
+		//Call function again (recurse), now providing previous node in path
+		ret = get_cur_weight(s_node->prev_search_node, s_start_node, cur_weight);
+		if (ret != SUCCESS) return ret;
+
+	}
+	
+
+}
+
+
+int get_nbr_index_by_id(s_node_t * s_node, uint64_t id, uint64_t * index) {
+
+	int ret;
+	uint64_t * nbr_id;
+
+	//For each neighbour
+	for (uint64_t i = 0; i < s_node->node->neighbours.length; i++) {
+		
+		ret = vector_get_ref(&s_node->node->neighbours, i, (char **) &nbr_id);
+		if (ret != SUCCESS) return ret;
+
+		if (*nbr_id == id) {
+			*index = i;
+			return SUCCESS;
+		}
+	}
+
+	return FAIL;
+}
+
+
 int get_index_by_s_node(vector_t * s_queue, s_node_t * s_node, uint64_t * index) {
 
 	int ret;
@@ -90,27 +153,36 @@ int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
 
 	int ret;
 	s_node_t * s_node;
+	s_node_t * s_start_node;
 	
 	uint64_t * nbr_id;
 	int64_t * nbr_weight;
 	s_node_t * nbr_s_node;
 	
-	int64_t cur_weight = 0;
+	int64_t cur_weight;
+	char nodes_stack_incomplete = 1;
 
 	//For every node on the graph
 	for (uint64_t i = 0; i < s_graph->graph->nodes.length; i++) {
 
-		ret = vector_get_ref(&s_graph->s_queue, 0, (char **) &s_node);
+		//Get node indexed at i in search queue
+		ret = vector_get_ref(&s_graph->s_queue, i, (char **) &s_node);
 		if (ret != SUCCESS) return ret;
 
 		//On first run, set cost of starting node to 0
 		if (i == 0) {
 			s_node->cost = 0;
+			s_start_node = s_node;
 		}
+
+		//Recursively calculate cur_weight for this iteration using prev_node
+		cur_weight = 0;
+		ret = get_cur_weight(s_node, s_start_node, &cur_weight);
+		if (ret != SUCCESS) return ret;
 
 		//For every neighbour of node
 		for (uint64_t j = 0; j < s_node->node->neighbours.length; j++) {
-			
+
 			//Get id & weight of neighbour indexed at j
 			ret = vector_get_ref(&s_node->node->neighbours, j, (char **) &nbr_id);
 			if (ret != SUCCESS) return ret;
@@ -121,21 +193,48 @@ int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
 			ret = get_s_node_by_id(s_graph, *nbr_id, &nbr_s_node);
 			if (ret != SUCCESS) return ret;
 
-			//Set nbr s_node's cost, prev search_node
-			nbr_s_node->cost = cur_weight + *nbr_weight;
-			nbr_s_node->prev_search_node = s_node;
+			//If this path is shorter
+			if (nbr_s_node->cost > cur_weight + *nbr_weight) {
+				
+				//Set nbr s_node's cost and prev search_node
+				nbr_s_node->cost = cur_weight + *nbr_weight;
+				nbr_s_node->prev_search_node = s_node;
+			
+				//Move neighbour
+				ret = queue_smart_move(&s_graph->s_queue, s_node);
+			}
 
+		} //End for every neighbour of node
 
-
-			/*
-			 *  Move neighbour
-			 *
-			 *	In preparation for next iteration, set cur_weight to cost of
-			 *	next iteration
-			 */
-		}
+		s_node->visited = 1;
 
 	} //End for every node
+
+	//Fetch end node, get ID
+	uint64_t * id_write = malloc(sizeof(uint64_t));
+	if (id_write == NULL) return MEM_ERR;
+
+	ret = get_s_node_by_id(s_graph, p->end_id, &s_node);
+	if (ret != SUCCESS) return ret;
+
+	memcpy(id_write, s_node->node->id);
+	
+	//Add node to stack, fetch previous node
+	while (nodes_stack_imcomplete) {
+
+		//Add id
+		ret = vector_add(&p->nodes_stack , 0, (char *) s_mem, VECTOR_APPEND_FALSE);
+		if (ret != SUCCESS) return ret;
+
+		//TODO
+		//
+		//Check if prev ID available, if yes set s_node to it.
+		//
+		//Find appropriate time to break this loop.
+		//
+		//Test, test it all!
+
+	}
 
 	return SUCCESS;
 }

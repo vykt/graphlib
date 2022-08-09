@@ -168,7 +168,8 @@ int main() {
 	for (uint64_t i = 0; i < g.nodes.length; i++) {
 		ret = vector_get_ref(&s_graph.s_queue, i, (char **) &s_node);
 	}
-	
+
+	//TODO test get_nbr_index_by_id()
 	
 	//dijkstra_pathfind()
 
