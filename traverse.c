@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <stdint.h>
 #include <limits.h>
@@ -29,7 +30,7 @@ int queue_smart_move(vector_t * s_queue, s_node_t * s_node) {
 		if (ret != SUCCESS) return ret;
 
 		//If s_node should be moved to this position
-		if (s_node->cost < temp_node->cost) {
+		if (s_node->cost <= temp_node->cost) {
 
 			//Get index of s_node
 			ret = get_index_by_s_node(s_queue, s_node, &s_node_index);
@@ -38,6 +39,7 @@ int queue_smart_move(vector_t * s_queue, s_node_t * s_node) {
 			//Move search node to ordered place in queue
 			ret = vector_mov(s_queue, s_node_index, i); //No op on s_node_index == i
 			if (ret != SUCCESS) return ret;
+			break;
 		} //End if s_node should be moved to this position
 
 	} //End for each node
@@ -49,7 +51,7 @@ int queue_smart_move(vector_t * s_queue, s_node_t * s_node) {
 int get_cur_weight(s_node_t * s_node, s_node_t * s_start_node, int64_t * cur_weight) {
 
 	int ret;
-	int index;
+	uint64_t index;
 	int64_t * weight;
 
 	//If no more previous nodes
@@ -84,7 +86,7 @@ int get_cur_weight(s_node_t * s_node, s_node_t * s_start_node, int64_t * cur_wei
 
 	}
 	
-
+	return SUCCESS;
 }
 
 
@@ -201,7 +203,7 @@ int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
 				nbr_s_node->prev_search_node = s_node;
 			
 				//Move neighbour
-				ret = queue_smart_move(&s_graph->s_queue, s_node);
+				ret = queue_smart_move(&s_graph->s_queue, nbr_s_node);
 			}
 
 		} //End for every neighbour of node
@@ -211,31 +213,35 @@ int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
 	} //End for every node
 
 	//Fetch end node, get ID
-	uint64_t * id_write = malloc(sizeof(uint64_t));
-	if (id_write == NULL) return MEM_ERR;
+	uint64_t * id_mem = malloc(sizeof(uint64_t));
+	if (id_mem == NULL) return MEM_ERR;
 
 	ret = get_s_node_by_id(s_graph, p->end_id, &s_node);
 	if (ret != SUCCESS) return ret;
 
-	memcpy(id_write, s_node->node->id);
+	memcpy(id_mem, &s_node->node->id, sizeof(uint64_t));
 	
 	//Add node to stack, fetch previous node
-	while (nodes_stack_imcomplete) {
+	while (nodes_stack_incomplete) {
+
+		memcpy(id_mem, &s_node->node->id, sizeof(uint64_t));
 
 		//Add id
-		ret = vector_add(&p->nodes_stack , 0, (char *) s_mem, VECTOR_APPEND_FALSE);
+		ret = vector_add(&p->nodes_stack , 0, (char *) id_mem, VECTOR_APPEND_FALSE);
 		if (ret != SUCCESS) return ret;
 
-		//TODO
-		//
-		//Check if prev ID available, if yes set s_node to it.
-		//
-		//Find appropriate time to break this loop.
-		//
-		//Test, test it all!
-
+		//If no previous node
+		if (s_node->prev_search_node == NULL) {
+			nodes_stack_incomplete = 0;
+			continue;
+		
+		//If previous node present
+		} else {
+			s_node = s_node->prev_search_node;
+		}
 	}
-
+	
+	free(id_mem);
 	return SUCCESS;
 }
 

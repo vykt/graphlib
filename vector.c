@@ -5,6 +5,9 @@
 #include "vector.h"
 #include "error.h"
 
+//DEBUG include, remove
+#include <stdio.h>
+#include "traverse.h"
 
 //Set element's data
 int vector_set(vector_t * v, uint64_t pos, char * data) {
@@ -173,21 +176,45 @@ int vector_mov(vector_t * v, uint64_t pos, uint64_t pos_new) {
 	if (pos == pos_new) return SUCCESS;
 
 	int ret;
+
+	//TODO DEBUG, REMOVE
+	printf("\nPOS = %lu, POS_NEW = %lu\n", pos, pos_new);
+	for (uint64_t i = 0; i < v->length; i++) {
+		s_node_t * temp_node;
+		ret = vector_get_ref(v, i, (char **) &temp_node);
+		printf("[before] ID of index %lu: id = %lu\n", i, temp_node->node->id);
+	}
+	//TODO DEBUG END
+
 	char * data = malloc(v->data_size);
 	if (data == NULL) return MEM_ERR;
 
+	//Get data of both indexes
 	ret = vector_get(v, pos, data);
 	if (ret != SUCCESS) { free(data); return ret; }
 
-	ret = vector_rmv(v, pos);
+	//If moving towards beginning
+	if (pos > pos_new) {
+		memmove(v->vector+((pos_new + 1) * v->data_size),
+				v->vector+(pos_new * v->data_size),
+				v->data_size * (pos - pos_new));
+	//else moving towards end
+	} else {
+		memmove(v->vector+(pos * v->data_size),
+				v->vector+((pos + 1) * v->data_size),
+			    v->data_size * (pos_new - pos));
+	} //End if moving towards beginning/end
+
+	ret = vector_set(v, pos_new, data);
 	if (ret != SUCCESS) { free(data); return ret; }
 
-	if (pos > pos_new) {
-		ret = vector_add(v, pos_new, data, VECTOR_APPEND_FALSE);
-	} else {
-		ret = vector_add(v, pos_new - 1, data, VECTOR_APPEND_FALSE);
+	//TODO DEBUG, REMOVE
+	for (uint64_t i = 0; i < v->length; i++) {
+		s_node_t * temp_node;
+		ret = vector_get_ref(v, i, (char **) &temp_node);
+		printf("[after] ID of index %lu: id = %lu\n", i, temp_node->node->id);
 	}
-	if (ret != SUCCESS) { free(data); return ret; }
+	//TODO DEBUG END
 
 	free(data);
 	return SUCCESS;

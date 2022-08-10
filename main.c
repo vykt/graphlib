@@ -48,7 +48,7 @@ int main() {
 	 *  A(0) -5- B(1) 3=7 D(3)
 	 *  
 	 *   |        |        |
-	 *   3        2        5
+	 *   3        8        5
 	 *   |        |        |
 	 *
 	 *  C(2) 6=4 E(4) -1- F(5)
@@ -80,7 +80,7 @@ int main() {
 	build_link(&link, 1, 3, 3, 7);
 	ret = graph_link_nodes(&g, link);
 	
-	build_link(&link, 1, 4, 2, 2);
+	build_link(&link, 1, 4, 8, 8);
 	ret = graph_link_nodes(&g, link);
 	
 	build_link(&link, 2, 4, 6, 4);
@@ -145,8 +145,11 @@ int main() {
 	path_req_t p;
 	s_graph_t s_graph;
 	s_node_t * s_node;
+	uint64_t index;
+	uint64_t * path_node_id;
 
-	ret = path_req_ini(&p, 2, 3);
+
+	ret = path_req_ini(&p, 5, 0);
 	printf("Initialise path request: %d\n", ret);
 
 	ret = search_graph_ini(&p, &g, &s_graph);
@@ -156,22 +159,15 @@ int main() {
 		ret = vector_get_ref(&s_graph.s_queue, i, (char **) &s_node);
 	}
 
-	//TODO: TEST
-	//
-	//queue_smart_insert()
+	//TODO test dijkstra_pathfind()!!!
+	ret = dijkstra_pathfind(&p, &s_graph);
+	printf("Dijkstra pathfind ret: %d\n", ret);
 	
-	ret = get_s_node_by_id(&s_graph, 4, &s_node);
-	s_node->cost = 11;
-
-	ret = queue_smart_move(&s_graph.s_queue, s_node);
-	
-	for (uint64_t i = 0; i < g.nodes.length; i++) {
-		ret = vector_get_ref(&s_graph.s_queue, i, (char **) &s_node);
+	//print IDs
+	for (uint64_t i = 0; i < p.nodes_stack.length; i++) {
+		ret = vector_get_ref(&p.nodes_stack, i, (char **) &path_node_id);
+		printf("path node: %lu, id: %lu\n", i, *path_node_id);
 	}
-
-	//TODO test get_nbr_index_by_id()
-	
-	//dijkstra_pathfind()
 
 	return 0;
 }
