@@ -163,6 +163,7 @@ int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
 	
 	int64_t cur_weight;
 	char nodes_stack_incomplete = 1;
+	uint64_t * end_id;
 
 	//For every node on the graph
 	for (uint64_t i = 0; i < s_graph->graph->nodes.length; i++) {
@@ -240,8 +241,20 @@ int dijkstra_pathfind(path_req_t * p, s_graph_t * s_graph) {
 			s_node = s_node->prev_search_node;
 		}
 	}
-	
+
 	free(id_mem);
+
+	//Check for success
+	ret = vector_get_ref(&p->nodes_stack, p->nodes_stack.length - 1, (char **) &end_id);
+	if (ret != SUCCESS) return ret;
+
+	//If end node not reached, return fail
+	if (*end_id != p->end_id) return FAIL;
+
+	//Write cost of end node to total_cost
+	ret = get_s_node_by_id(s_graph, *end_id, &s_node);
+	p->total_cost = s_node->cost;
+
 	return SUCCESS;
 }
 

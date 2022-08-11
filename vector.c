@@ -5,9 +5,6 @@
 #include "vector.h"
 #include "error.h"
 
-//DEBUG include, remove
-#include <stdio.h>
-#include "traverse.h"
 
 //Set element's data
 int vector_set(vector_t * v, uint64_t pos, char * data) {
@@ -177,15 +174,6 @@ int vector_mov(vector_t * v, uint64_t pos, uint64_t pos_new) {
 
 	int ret;
 
-	//TODO DEBUG, REMOVE
-	printf("\nPOS = %lu, POS_NEW = %lu\n", pos, pos_new);
-	for (uint64_t i = 0; i < v->length; i++) {
-		s_node_t * temp_node;
-		ret = vector_get_ref(v, i, (char **) &temp_node);
-		printf("[before] ID of index %lu: id = %lu\n", i, temp_node->node->id);
-	}
-	//TODO DEBUG END
-
 	char * data = malloc(v->data_size);
 	if (data == NULL) return MEM_ERR;
 
@@ -207,14 +195,6 @@ int vector_mov(vector_t * v, uint64_t pos, uint64_t pos_new) {
 
 	ret = vector_set(v, pos_new, data);
 	if (ret != SUCCESS) { free(data); return ret; }
-
-	//TODO DEBUG, REMOVE
-	for (uint64_t i = 0; i < v->length; i++) {
-		s_node_t * temp_node;
-		ret = vector_get_ref(v, i, (char **) &temp_node);
-		printf("[after] ID of index %lu: id = %lu\n", i, temp_node->node->id);
-	}
-	//TODO DEBUG END
 
 	free(data);
 	return SUCCESS;

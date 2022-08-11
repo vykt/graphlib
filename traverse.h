@@ -31,6 +31,7 @@ struct path_req {
 	uint64_t start_id;
 	uint64_t end_id;
 
+	int64_t total_cost;
 	vector_t nodes_stack;
 };
 

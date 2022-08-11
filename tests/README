@@ -1,0 +1,8 @@
+The images in this directory are drawn out versions of the graphs used to perform
+tests when running this program.
+
+test1.png: First test, end is not connected and is not reachable.
+
+test2.png: Second test, regular graph, few nodes.
+
+test3.png: Third test, regular graph, more nodes.
