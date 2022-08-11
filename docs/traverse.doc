@@ -1,0 +1,114 @@
+vykt's graph library - traversal
+------------------------------
+
+
+	s_graph_t:
+
+	Search graph type, contains the graph and provides a node queue used during
+	sorting. Contains:
+
+		graph_t * graph  - Pointer to graph to operate on.
+	
+		vector_t s_queue - Queue of nodes to search through, used internally.
+
+
+	
+	path_req_t:
+
+	Traversal request struct. Contains IDs of the node to start searching from and
+	the node to traverse to. Also contains total_cost, shorthand for getting total
+	weight of path. Contains:
+
+		uint64_t start_id    - ID of starting node.
+
+		uint64_t end_id      - ID of node to traverse to.
+
+		int64_t total_cost   - Total cost of traversal to node end_id from start_id.
+		                       Set by dijkstra_pathfind().
+
+		vector_t nodes_stack - Stack of node IDs on the optimal path from start to
+		                       end.
+
+
+To perform a search, both search graph and path request structs must be initialised.
+This is done using the initialiser functions:
+
+	search_graph_ini():
+
+	Search graph initialiser function. Takes:
+
+		path_req_t * p      - Pointer to initialised path request structure.
+
+		graph_t * g         - Pointer to graph to operate on.
+	
+		s_graph_t * s_graph - Pointer to search graph structure to initialise.
+
+	Returns:
+
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
+		MEM_ERR  - Failure to allocate heap space.
+
+
+	path_req_ini():
+
+	Path request initialiser function. Takes:
+
+		path_req_t * p    - Pointer to path request structure to initialise.
+
+		uint64_t start_id - Starting node ID.
+
+		uint64_t end_id   - ID of node to navigate to.
+
+	Returns:
+
+		SUCCESS - Successful execution.
+		MEM_ERR - failure to allocate heap space.
+
+
+Following the completion of a search, both structures need to be terminated using
+the provided terminator functions to free all involved memory:
+
+	search_graph_end():
+
+	Search graph termination function. Frees memory. Takes:
+
+		s_graph_t * s_graph - Pointer to search graph structure to terminate.
+
+	Returns:
+
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
+
+
+	path_req_end():
+
+	Path request termination function. Frees memory. Takes:
+
+		path_req_t * p - Pointer to path request structure to terminate.
+
+	Returns:
+
+		SUCCESS  - Successful execution.
+		NULL_ERR - One or more necessary arguments are NULL.
+
+
+When both search graph and path request structures are initialised, a search can
+be performed:
+
+	dijkstra_pathfind():
+
+	Pathfind between start and end nodes, return path and weight of traversal.
+	Takes:
+
+		path_req_t * p      - Path request structure, provides request information.
+
+		s_graph_t * s_graph - Search graph structure, wrapper for graph, used to
+		                      store data during calculation.
+
+	Returns:
+
+		SUCCESS           - Succeeded in calculating a path.
+		FAIL              - Failed to calculate a path.
+		NULL_ERR          - One or more necessary arguments are NULL.
+		MEM_ERR           - Unable to allocate space on heap.
